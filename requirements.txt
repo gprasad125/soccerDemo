@@ -1,4 +1,5 @@
 altair
 pandas
 streamlit
-zipfile36
+matplotlib
+random
