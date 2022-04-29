@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+import altair as alt
 
 st.markdown(
     "# Soccer Events by Latitude, Longitude Coordinates"
@@ -26,6 +27,7 @@ clean = clean.rename(columns = {"possession_team_name": "team",
                                "location_x": "x",
                                "location_y": "y"})
 
+clean = clean.sample(frac=1).reset_index(drop = True)
 st.write(clean.head())
 
 def make_color():
@@ -43,13 +45,32 @@ for ev in event_colors:
 
 madrid = clean[clean["team"] == "Real Madrid"]
 
-fig, ax = plt.subplots()
+fig_madrid, ax_madrid = plt.subplots()
 scatter_x = madrid['x'].to_numpy()
 scatter_y = madrid['y'].to_numpy()
 labels = madrid['event'].to_numpy()
 for l in np.unique(labels):
     i = np.where(labels == l)
     color = event_colors[l]
-    ax.scatter(scatter_x[i], scatter_y[i], c = color, label = l)
-ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
-plt.show()
+    ax_madrid.scatter(scatter_x[i], scatter_y[i], c = color, label = l)
+ax_madrid.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+st.pyplot(fig_madrid)
+
+man_city = clean[clean["team"] == "Manchester City"]
+
+fig_city, ax_city = plt.subplots()
+scatter_x = man_city['x'].to_numpy()
+scatter_y = man_city['y'].to_numpy()
+labels = man_city['event'].to_numpy()
+for l in np.unique(labels):
+    i = np.where(labels == l)
+    color = event_colors[l]
+    ax_city.scatter(scatter_x[i], scatter_y[i], c = color, label = l)
+ax_city.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+st.pyplot(fig_city)
+
+chart = alt.Chart(man_city).mark_point().encode(
+    x = "x", y = "y", color = "event").interactive().properties(
+        width = 650, height = 500, title = "Man City Event by Coord."
+    )
+st.altair_chart(chart)
