@@ -11,11 +11,11 @@ st.markdown(
 
 df = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/coord_events.csv")
 def to_int(coord):
-
+    
     if not pd.isnull(coord):
-
+        
         coord = int(coord)
-
+    
     return coord
 
 df['location_x'] = df['location_x'].apply(to_int)
@@ -31,13 +31,13 @@ clean = clean.sample(frac=1).reset_index(drop = True)
 st.write(clean.head())
 
 def make_color():
-
+    
     color = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
     return color
 
 event_colors = dict.fromkeys(clean['event'].unique())
 for ev in event_colors:
-
+    
     number_of_colors = 8
     color = make_color()
     if color not in event_colors.values():
@@ -73,5 +73,6 @@ st.pyplot(fig_city)
 
 chart = alt.Chart(man_city).mark_point().encode(
     x = "x", y = "y", color = "event").interactive().properties(
-        width = 650, height = 500, title = "Man City Event by Coord.")
+        width = 650, height = 500, title = "Man City Event by Coord."
+    )
 st.altair_chart(chart)
