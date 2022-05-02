@@ -2,4 +2,4 @@ altair
 pandas
 streamlit
 matplotlib
-random
+random2
