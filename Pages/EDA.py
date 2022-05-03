@@ -7,11 +7,11 @@ import altair as alt
 
 
 def page():
-    st.markdown("# Team Event By Coordinates")
+    st.markdown("## Team Event By Coordinates")
 
 
-    st.markdown("## The Dataset")
-    st.markdown("This pared-down dataset contains only four features – team name, event name, and (x, y) coordinates along the following coordinate system, where the leftmost corner represents (0, 0) and the top right represents (120, 80).")
+    st.markdown("### The Dataset")
+    st.markdown("This pared-down dataset contains only four features – team name, event name, and (x, y) coordinates along the following coordinate system, where the top-left corner represents (0, 0) and the bottom-right represents (120, 80).")
 
     @st.cache(suppress_st_warning=True)
     def load_and_clean():
