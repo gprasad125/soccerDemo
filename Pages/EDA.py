@@ -5,9 +5,12 @@ import matplotlib.pyplot as plt
 import random
 import altair as alt
 
-st.markdown("# Soccer Events by Latitude, Longitude Coordinates")
+st.markdown("# Exploratory Data Analysis")
 
-coord_df = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/coord_events.csv")
+
+st.markdown("## The Dataset")
+st.markdown("Here, we have our data that we used to explore.")
+coord_df = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/coord_events.csv")
 def to_int(coord):
 
     if not pd.isnull(coord):
