@@ -62,30 +62,35 @@ def page():
 
     st.image('Assets/coordinates.png')
 
-    example_teams = ["Barcelona", "Real Madrid", "Liverpool", "Manchester United", "Manchester City"]
-    option = st.selectbox("Select a team", example_teams)
-    st.write("You have chosen: " + option)
-    #
-    option_df = data[data["team"] == option]
-    st.write(option_df.head())
+    example_teams = ["-","Barcelona", "Real Madrid", "Liverpool", "Manchester United", "Manchester City"]
+    option = st.selectbox("Select a chosen team", example_teams)
+    st.write("or")
+    text_team = st.text_input("Write in a team", "")
 
-    fig, ax = plt.subplots()
+    if option == "-":
+        st.write("Go on, choose a team!")
+    else:
+        if text_team in np.unique(data["team"]):
+            option = text_team
+            st.write("You have chosen: " + option)
+        elif (text_team == ""):
+            st.write("You can try either way!")
+        else:
+            st.write("That team does not exist in our data! Please try again.")
 
-    x = option_df["x"].to_numpy()
-    y = option_df["y"].to_numpy()
-    labels = option_df["event"].to_numpy()
+        option_df = data[data["team"] == option]
+        st.write(option_df.head())
 
-    for l in np.unique(labels):
-        i = np.where(labels == l)
-        color = event_colors[l]
-        ax.scatter(x[i], y[i], c = color, label = l)
-    ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
-    plt.title(option + " Events By (x, y) Coordinates")
-    st.pyplot(fig)
+        fig, ax = plt.subplots()
 
+        x = option_df["x"].to_numpy()
+        y = option_df["y"].to_numpy()
+        labels = option_df["event"].to_numpy()
 
-    #
-    # chart = alt.Chart(option_df).mark_point().encode(
-    #     x = "x", y = "y", color = "event").interactive().properties(
-    #         width = 650, height = 500, title = option + " Event by Coord.")
-    # st.altair_chart(chart)
+        for l in np.unique(labels):
+            i = np.where(labels == l)
+            color = event_colors[l]
+            ax.scatter(x[i], y[i], c = color, label = l)
+        ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+        plt.title(option + " Events By (x, y) Coordinates")
+        st.pyplot(fig)
