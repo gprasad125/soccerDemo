@@ -8,10 +8,10 @@ from mplsoccer import Pitch
 
 
 def page():
-    st.markdown("## Team Event By Coordinates")
+    st.markdown("## Location-Based Events By Team")
 
 
-    st.markdown("### The Dataset")
+    #st.markdown("### The Dataset")
     st.markdown("This reduced version of our dataset contains only four features – team name, (x, y) coordinates, and the event type.")
     st.markdown("The coordinates follow StatsBomb's coordinate system, where the top-left corner represents (0, 0) and the bottom-right represents (120, 80).")
 
@@ -68,14 +68,27 @@ def page():
 
     leagues = teams_leagues.get('competition_names').unique()
     option = st.selectbox("Select a league to choose a team from:", leagues)
-    st.write("Some notes about the league choice - ")
-    st.write("'Men's International' includes UEFA Euro and FIFA World Cup competitions, while 'Women's International' only includes FIFA Women's World Cup competitions.")
-    st.write("Additionally, teams that are labeled as being in the Champions League only have Champions League data in our dataset, while teams in the Premier League or La Liga can have data from both their league and the Champions League.")
+
+    if (option == "FA Women's Super League"):
+        st.info("Our data for **" + option + "** teams includes data from the 2018/19, 2019/20, & 2020/21 seasons.")
+    elif (option == "NWSL"):
+        st.info("Our data for **" + option + "** teams includes data from the 2018 season.")
+    elif (option == "La Liga"):
+        st.info("Our data for **" + option + "** teams includes data from the 2004-2018 and 2019-2021 seasons, as well as any time a team appeared in the Champions League for the 2003-2005, 2006, & 2008-2019 seasons.")
+    elif (option == "Champions League"):
+        st.info("Our data for **" + option + "** teams includes data from the 2003-2005, 2006, & 2008-2019 seasons.")
+    elif (option == "Premier League"):
+        st.info("Our data for **" + option + "** teams includes data from the 2003/2004 season, as well as any time a team appeared in the Champions League for the 2003-2005, 2006, & 2008-2019 seasons.")
+    elif (option == "Men's International"):
+        st.info("Our data for **" + option + "** competitions includes data from the 2018 World Cup and the 2020 UEFA Euro Cup.")
+    elif (option == "Women's International"):
+        st.info("Our data for **" + option + "** competitions includes data from the 2019 Women's World Cup.")
+    
 
     teams = teams_leagues[teams_leagues.get('competition_names') == option].get('team').unique()
     team_option = st.selectbox("Select a team:", teams)
 
-    st.write("Here are the events with location data for " + team_option + ".")
+    st.write("Here are the first 5 events with location data for **" + team_option + "**.")
     option_df = data[data["team"] == team_option]
     st.write(option_df.head())
 
