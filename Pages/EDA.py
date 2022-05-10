@@ -114,7 +114,7 @@ def page():
     ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
     plt.title(team_option + " Events by (x, y) Coordinates")
 
-    st.pyplot(fig)
+    st.pyplot(fig, ax)
 
     #ax.text('Defending', (5, 5), xycoords = 'figure points')
     #plt.text('Attacking')
@@ -158,7 +158,36 @@ def page():
 
     st.markdown("### Analyzing a Team's Shots")
     shot_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/shots_reduced.csv")
-    st.write(shot_data.head())
+    shot_data = shot_data.rename(columns = {'team_name': 'team', 'play_pattern_name': 'play_pattern'})
+    
+    play_patterns = shot_data.get('play_pattern').sort_values(ascending = True).unique()
+
+    team_shot_data = shot_data[shot_data["team"] == team_option]
+
+    st.write(team_shot_data.head())
+
+    fig2 = plt.figure(2)
+
+    minute_vals = list(range(0, 131, 5))
+    minute_df = pd.DataFrame({'minute': minute_vals})
+    minute_df
+
+    minute_bins = team_shot_data.get('minute').transform(lambda x: x - (x%5))
+    vc_df = pd.DataFrame(minute_bins.value_counts().reset_index()).rename(columns = {'minute': 'count', 'index': 'minute'})
+    full_minutes = vc_df.merge(minute_df, how = 'outer').fillna(0)
+
+    sns.set(rc = {'figure.figsize':(15,15)})
+    axs2 = sns.barplot(x = full_minutes['minute'], y = full_minutes['count']).set(title = 'Shot Distribution with 5 Minute Bins')
+
+    st.pyplot(fig2, axs2)
+
+    fig3 = plt.figure(3)
+
+    shot_reasons = team_shot_data.get('play_pattern')
+    sns.set(rc = {'figure.figsize':(15,15)})
+    axs3 = sns.countplot(shot_reasons, order = play_patterns).set(title = 'Shots by Play Pattern')
+
+    st.pyplot(fig3, axs3)
 
 
 
