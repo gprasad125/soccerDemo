@@ -80,18 +80,20 @@ def page():
 
     teams = teams_leagues[teams_leagues.get('competition_names') == option].get('team').unique()
     team_option = st.selectbox("Select a team:", teams, index = 4)
+    option_df = data[data["team"] == team_option]
+    num_team_events = option_df.shape[0]
+    st.info('We have ' + str(num_team_events) + ' events for **' + team_option + '**.')
 
     st.markdown("### Plotting Team Events By Location")
 
     #st.markdown("### The Dataset")
     st.markdown("This reduced version of our dataset contains only four features – team name, (x, y) coordinates, and the event type.")
     st.markdown("The coordinates follow StatsBomb's coordinate system, where the top-left corner represents (0, 0) and the bottom-right represents (120, 80).")
-    st.write(data.head())
+    #st.write(data.head())
 
     st.image('Assets/coordinates.png')
 
     st.write("Here are the first 5 events with location data for **" + team_option + "**.")
-    option_df = data[data["team"] == team_option]
     st.write(option_df.head())
 
     # fig, ax = plt.subplots()
@@ -115,6 +117,10 @@ def page():
     plt.title(team_option + " Events by (x, y) Coordinates")
 
     st.pyplot(fig, ax)
+
+    # RETURN TO TEAM SELECITON
+    team_select = 'selecting-a-team'
+    st.markdown(f"<a href='#{team_select}'>Try a different a team?</a>", unsafe_allow_html=True)
 
     #ax.text('Defending', (5, 5), xycoords = 'figure points')
     #plt.text('Attacking')
@@ -166,6 +172,8 @@ def page():
 
     st.write(team_shot_data.head())
 
+    shotcol1, shotcol2 = st.columns(2)
+
     fig2 = plt.figure(2)
 
     minute_vals = list(range(0, 131, 5))
@@ -179,7 +187,7 @@ def page():
     sns.set(rc = {'figure.figsize':(15,15)})
     axs2 = sns.barplot(x = full_minutes['minute'], y = full_minutes['count']).set(title = 'Shot Distribution with 5 Minute Bins')
 
-    st.pyplot(fig2, axs2)
+    shotcol1.pyplot(fig2, axs2)
 
     fig3 = plt.figure(3)
 
@@ -187,7 +195,22 @@ def page():
     sns.set(rc = {'figure.figsize':(15,15)})
     axs3 = sns.countplot(shot_reasons, order = play_patterns).set(title = 'Shots by Play Pattern')
 
-    st.pyplot(fig3, axs3)
+    shotcol2.pyplot(fig3, axs3)
+
+    # RETURN TO TEAM SELECTION
+    st.markdown(f"<a href='#{team_select}'>Try a different a team?</a>", unsafe_allow_html=True)
+
+    st.markdown("### Exploring Team Lineup Frequencies")
+
+    num_lineups = 5
+
+
+    st.markdown("Looking at the top " + str(num_lineups) + " lineups for **" + team_option + "**.")
+
+    ### PULL UP LINEUPS, FIND VALUE-COUNTS, AND THEN FIND CORRESPONDING IMAGES FOR TOP 5
+
+
+
 
 
 

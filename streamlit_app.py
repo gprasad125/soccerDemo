@@ -9,7 +9,7 @@ from Pages import multiPage, EDA, modeling
 app = multiPage.MultiPage()
 
 # Title of the main page
-st.markdown("# DS3 Soccer Project")
+st.markdown("# Passing and Team Success in Soccer")
 
 # Add all your application here
 app.add_page("Exploratory Data Analysis", EDA.page)
