@@ -77,12 +77,14 @@ def page():
     elif (option == "Women's International"):
         st.info("Our data for **" + option + "** competitions includes data from the 2019 Women's World Cup.")
     
+    num_games_df = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/game_counts.csv").set_index('team')
 
     teams = teams_leagues[teams_leagues.get('competition_names') == option].get('team').unique()
     team_option = st.selectbox("Select a team:", teams, index = 4)
     option_df = data[data["team"] == team_option]
     num_team_events = option_df.shape[0]
-    st.info('We have ' + str(num_team_events) + ' events for **' + team_option + '**.')
+    num_games = num_games_df.loc[team_option]['count']
+    st.info('We have ' + str(num_team_events) + ' events for **' + team_option + '** in ' + str(num_games) + ' games.')
 
     st.markdown("### Plotting Team Events By Location")
 
