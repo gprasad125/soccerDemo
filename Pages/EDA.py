@@ -212,12 +212,3 @@ def page():
     ### PULL UP LINEUPS, FIND VALUE-COUNTS, AND THEN FIND CORRESPONDING IMAGES FOR TOP 5
 
 
-
-
-
-
-
-    st.markdown("### Acknowledgments")
-    st.info("[StatsBomb Open Data](https://github.com/statsbomb/open-data)\n\n[mplsoccer](https://mplsoccer.readthedocs.io/en/latest/)")
-
-
