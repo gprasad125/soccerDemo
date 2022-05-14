@@ -205,11 +205,23 @@ def page():
     st.markdown(f"<a href='#{team_select}'>Try a different team?</a>", unsafe_allow_html=True)
 
     ## PLAYER ANALYSIS SECTION ##
+    def calculate_nearest_point(point, other_points):
+        smallest_i = 0
+        smallest_dist = np.inf 
+        for index, check in enumerate(other_points):
+            dist = ((check[0] - point[0])**2 + (check[1] - point[1])**2)**0.5
+            if dist < smallest_dist:
+                smallest_i = index
+                smallest_dist = dist
+        return other_points[smallest_i]
+
     st.markdown("### Design Your Own Team")
-    st.markdown("Design your own version of **" + team_option + "**. You must choose exactly 11 positions (1 goalkeeper, and 10 of your choice). This will show the average pass of each of the 11 players in the positions you put them in (average pass is determined by starting location, length, and angle).")
+    st.markdown("Design your own version of **" + team_option + "**. You must choose exactly 11 positions (1 goalkeeper, and 10 of your choice). This will show how your selected players might distribute the ball across the field (examining all their passes from the position and where their closest teammate might be).")
     
-    ppc_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_pos_counts.csv").set_index(['team_name','position','player_name'])
-    team_averages = ppc_data.loc[team_option]
+    ppa_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_pos_averages.csv").set_index(['team_name','position_name','player_name'])
+    team_averages = ppa_data.loc[team_option]
+
+    pploc_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_positions_endlocs.csv")
 
     attack = ['Left Wing', 'Right Center Forward', 'Right Wing', 'Striker', 'Left Center Forward', 'Secondary Striker']
     mid = ['Right Defensive Midfield', 'Center Defensive Midfield', 'Left Defensive Midfield', 'Right Midfield', 'Right Center Midfield', 'Center Midfield', 'Left Center Midfield', 'Left Midfield', 'Right Attacking Midfield', 'Center Attacking Midfield', 'Left Attacking Midfield']
@@ -272,9 +284,41 @@ def page():
     n_selected_pos = len(player_indexes)
 
     if pos_submitted and n_selected_pos == 11:
-        #st.text(player_indexes)
+        pitch2 = Pitch(pitch_type = 'statsbomb', pitch_color = 'grass', line_color='white', stripe=True)
+        fig4, ax4  = pitch2.draw(figsize=(16, 8))
 
-        # GRAPH!!!
+        dot_locations = []
+
+        for duo in player_indexes:
+            info = team_averages.loc[duo]
+            dot_locations.append((info['location_x'], info['location_y']))
+            ax4.scatter(info['location_x'], info['location_y'], label = duo[0], s = 100)
+            ax4.text(info['location_x'] + 1, info['location_y'] + 1, s = np.round(info['simple_pass_accuracy'], 2), color = 'yellow', fontweight = 'bold')
+
+        for i, duo in enumerate(player_indexes):
+            locs_removed = dot_locations[0:i] + dot_locations[i+1:]
+            # COME BACK TO - HOW DO I CREATE A COLOR DICT FOR THIS AND MATCH COLOR
+            #st.text(duo[0])
+            #st.text(duo[1])
+            player_data = pploc_data[(pploc_data['player_name'] == duo[1]) & (pploc_data['position_name'] == duo[0])]
+            end_xs = player_data.get('pass_end_location_x')
+            end_ys = player_data.get('pass_end_location_y')
+            locs = pd.Series(zip(end_xs, end_ys))
+            closest_locs = locs.apply(calculate_nearest_point, args = (locs_removed, ))
+
+            counts_closest = closest_locs.value_counts(normalize = True)
+
+            info = team_averages.loc[duo]
+            for index, val in counts_closest.iteritems():
+                #st.text(index)
+                ax4.arrow(x = info['location_x'], y = info['location_y'], dx = index[0] - info['location_x'], dy = index[1] - info['location_y'], color = 'black', lw = val * 3)
+
+        ax4.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+        st.pyplot(fig4, ax4)
+
+        # ADD INFO ABOUT COUNTS - COME BACK TO
+
+        # OLD VERSION OF GRaPH
         # pitch2 = Pitch(pitch_type = 'statsbomb', pitch_color = 'grass', line_color='white', stripe=True)
         # # specifying figure size (width, height)
         # fig4, ax4  = pitch2.draw(figsize=(16, 8))
@@ -286,7 +330,7 @@ def page():
         # ax4.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
         # st.pyplot(fig4, ax4)
 
-        st.text('graph here')
+        #st.text('graph here')
 
     elif pos_submitted and n_selected_pos != 11:
         st.markdown('Please double check that you have selected 11 players exactly.')
