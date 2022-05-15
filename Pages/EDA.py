@@ -38,20 +38,25 @@ def page():
     data = load_and_clean()
 
     @st.cache(suppress_st_warning=True)
-    def make_color_dict():
+    def make_color_dict(labels):
+
+        palette = sns.color_palette("husl", len(labels))
 
         def make_color():
             color = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
             return color
 
 
-        event_colors = dict.fromkeys(data['event'].unique())
-        for ev in event_colors:
+        event_colors = {}
 
-            number_of_colors = 8
-            color = make_color()
-            if color not in event_colors.values():
-                event_colors[ev] = color
+        #dict.fromkeys(labels)
+        for ind, ev in enumerate(labels):
+            event_colors[ev] = palette[ind]
+
+            #number_of_colors = 8
+            #color = make_color()
+            #if color not in event_colors.values():
+                #event_colors[ev] = color
 
         return event_colors
 
@@ -82,6 +87,7 @@ def page():
     teams = teams_leagues[teams_leagues.get('competition_names') == option].get('team').unique()
     team_option = st.selectbox("Select a team:", teams, index = 4)
     option_df = data[data["team"] == team_option]
+
     num_team_events = option_df.shape[0]
     num_games = num_games_df.loc[team_option]['count']
     st.info('We have ' + str(num_team_events) + ' events for **' + team_option + '** in ' + str(num_games) + ' games.')
@@ -106,7 +112,7 @@ def page():
     y = option_df["y"].to_numpy()
     labels = option_df["event"].to_numpy()
     unique_labels = np.unique(labels)
-    event_colors = make_color_dict()
+    event_colors = make_color_dict(unique_labels)
 
     event_form = st.form("events")
     event_options = event_form.multiselect("Please choose which events you would like to see plotted.", unique_labels, default = ['Shot', 'Goal Keeper'])
@@ -116,12 +122,12 @@ def page():
         for l in event_options:
             i = np.where(labels == l)
             color = event_colors[l]
-            ax.scatter(x[i], y[i], c = color, label = l, s = 1)
+            ax.scatter(x[i], y[i], c = color, label = l, s = 5)
         ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
         plt.title(team_option + " Events by (x, y) Coordinates")
 
         st.pyplot(fig, ax)
-    elif len(event_options) == 0:
+    elif event_submitted and len(event_options) == 0:
         st.markdown('You have not selected any events - please select again.')
 
     # RETURN TO TEAM SELECITON
@@ -218,6 +224,8 @@ def page():
     st.markdown("### Design Your Own Team")
     st.markdown("Design your own version of **" + team_option + "**. You must choose exactly 11 positions (1 goalkeeper, and 10 of your choice). This will show how your selected players might distribute the ball across the field (examining all their passes from the position and where their closest teammate might be).")
     
+    st.info("If you're not sure where to start, we recommend choosing a 4-3-3 structure (4 defenders, 3 midfielders, and 3 attackers), as that was by far the most common lineup structure in our data.")
+
     ppa_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_pos_averages.csv").set_index(['team_name','position_name','player_name'])
     team_averages = ppa_data.loc[team_option]
 
@@ -284,16 +292,18 @@ def page():
     n_selected_pos = len(player_indexes)
 
     if pos_submitted and n_selected_pos == 11:
-        pitch2 = Pitch(pitch_type = 'statsbomb', pitch_color = 'grass', line_color='white', stripe=True)
+        pitch2 = Pitch(pitch_type = 'statsbomb', pitch_color = '#D3D3D3', line_color='white')
         fig4, ax4  = pitch2.draw(figsize=(16, 8))
 
         dot_locations = []
 
+        pos_dict = make_color_dict(np.array(player_indexes)[:, 0])
+
         for duo in player_indexes:
             info = team_averages.loc[duo]
             dot_locations.append((info['location_x'], info['location_y']))
-            ax4.scatter(info['location_x'], info['location_y'], label = duo[0], s = 100)
-            ax4.text(info['location_x'] + 1, info['location_y'] + 1, s = np.round(info['simple_pass_accuracy'], 2), color = 'yellow', fontweight = 'bold')
+            ax4.scatter(info['location_x'], info['location_y'], label = duo[0], s = 100, c = pos_dict[duo[0]])
+            ax4.text(info['location_x'] + 1, info['location_y'] + 1, s = np.round(info['simple_pass_accuracy'], 2), color = 'black', fontweight = 'bold')
 
         for i, duo in enumerate(player_indexes):
             locs_removed = dot_locations[0:i] + dot_locations[i+1:]
@@ -311,7 +321,7 @@ def page():
             info = team_averages.loc[duo]
             for index, val in counts_closest.iteritems():
                 #st.text(index)
-                ax4.arrow(x = info['location_x'], y = info['location_y'], dx = index[0] - info['location_x'], dy = index[1] - info['location_y'], color = 'black', lw = val * 3)
+                ax4.arrow(x = info['location_x'], y = info['location_y'] - 0.1, dx = index[0] - info['location_x'], dy = index[1] - info['location_y'], color = pos_dict[duo[0]], lw = val * 10)
 
         ax4.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
         st.pyplot(fig4, ax4)
