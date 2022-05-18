@@ -90,7 +90,10 @@ def page():
 
     num_team_events = option_df.shape[0]
     num_games = num_games_df.loc[team_option]['count']
-    st.info('We have ' + str(num_team_events) + ' events for **' + team_option + '** in ' + str(num_games) + ' games.')
+    if (option == "Men's International" or option == "Women's International"):
+        st.info('We have ' + str(num_team_events) + ' events for the **' + team_option + '** international team in ' + str(num_games) + ' games.')
+    else:
+        st.info('We have ' + str(num_team_events) + ' events for **' + team_option + '** in ' + str(num_games) + ' games.')
 
     ## EVENTS ##
     st.markdown("### Plotting Team Events By Location")
@@ -241,8 +244,18 @@ def page():
         passing_data['possession_team_name'] = passing_data['possession_team_name'].replace({'Seattle Reign': 'OL Reign', 'Sky Blue FC':'NJ/NY Gotham FC'})
         passing_data['team_name'] = passing_data['team_name'].replace({'Seattle Reign': 'OL Reign', 'Sky Blue FC':'NJ/NY Gotham FC'})
 
+        def find_field_section(x):
+            if x < 40:
+                return 'Defending Third'
+            elif x > 80:
+                return 'Attacking Third'
+            else:
+                return 'Middle Third'
+
+        passing_data['field_section'] = passing_data['pass_end_location_x'].transform(find_field_section)
+
         # DROP COLUMNS
-        reduced_pass = passing_data.get(['possession_team_name', 'idx', 'level_0', 'pass_recipient_name'])
+        reduced_pass = passing_data.get(['possession_team_name', 'idx', 'level_0', 'pass_recipient_name', 'field_section'])
 
         st.write("Running for 1st time only!")
         return reduced_pass
@@ -252,14 +265,18 @@ def page():
     team_pass_data = pass_data[pass_data.get('possession_team_name') == team_option].reset_index(drop = True)
 
     team_name_counts = team_pass_data.groupby('idx')['pass_recipient_name'].nunique()
+    #st.table(team_name_counts.head(5))
     team_pass_counts = team_pass_data.groupby('idx')['level_0'].count()
+    #st.table(team_pass_counts.head(5))
+    last_locs = team_pass_data.drop_duplicates(subset = 'idx', keep = 'last')[['idx', 'field_section']].set_index('idx')['field_section']
+    #st.table(last_locs.head(5))
 
     fig4 = plt.figure(3)
 
-    axs4 = sns.scatterplot(x = team_name_counts, y = team_pass_counts)
-    axs4.set_xlabel("# of Unique Players Involved in Passing Chain", fontsize = 20)
-    axs4.set_ylabel("# of Passes in Passing Chain", fontsize = 20)
-    axs4.set_title('# of Passes vs Unique Players in Passing Chain', fontsize = 40)
+    axs4 = sns.scatterplot(x = team_pass_counts, y = team_name_counts, hue = last_locs, legend = 'brief')
+    axs4.set_xlabel("# of Passes in Passing Chain", fontsize = 20)
+    axs4.set_ylabel("# of Unique Players Involved in Passing Chain", fontsize = 20)
+    axs4.set_title('# of Passes vs Unique Recipients in Passing Chain', fontsize = 30)
 
     st.pyplot(fig4, axs4)
 

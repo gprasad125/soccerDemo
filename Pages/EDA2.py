@@ -36,7 +36,12 @@ def page():
     team_option = st.selectbox("Select a team:", teams, index = 4)
 
     num_games = num_games_df.loc[team_option]['count']
-    st.info('We have **' + str(num_games) + '** games worth of data for **' + team_option + '**.')
+
+    if (option == "Men's International" or option == "Women's International"):
+        st.info('We have **' + str(num_games) + '** games worth of data for the **' + team_option + '** international team.')
+    else:
+        st.info('We have **' + str(num_games) + '** games worth of data for **' + team_option + '**.')
+
 
     def make_color_dict(labels):
 
@@ -152,14 +157,12 @@ def page():
             ax.scatter(info['location_x'], info['location_y'], label = duo[0], s = 100, c = pos_dict[duo[0]])
             ax.text(info['location_x'] + 1, info['location_y'] + 1, s = np.round(info['simple_pass_accuracy'], 2), color = 'black', fontweight = 'bold')
 
-        st.markdown('Info about the players you picked:')
-
         info_text = ""
         unknown_trigger = False
 
         for i, duo in enumerate(player_indexes):
             locs_removed = dot_locations[0:i] + dot_locations[i+1:]
-            player_data = pploc_data[(pploc_data['player_name'] == duo[1]) & (pploc_data['position_name'] == duo[0])]
+            player_data = pploc[(pploc['player_name'] == duo[1]) & (pploc['position_name'] == duo[0])]
             game_count = 'an unknown # of'
 
             if duo in team_counts.index:
@@ -190,6 +193,7 @@ def page():
         ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
         st.pyplot(fig, ax)
 
+        st.markdown('Info about the players you picked:')
         st.markdown(info_text)
 
         if unknown_trigger:
