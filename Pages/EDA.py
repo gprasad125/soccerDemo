@@ -173,10 +173,17 @@ def page():
 
     ## SHOT BAR GRAPHS ##
     st.markdown("### Analyzing a Team's Shots")
-    shot_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/shots_reduced.csv")
-    shot_data = shot_data.rename(columns = {'team_name': 'team', 'play_pattern_name': 'play_pattern'})
-    
-    play_patterns = shot_data.get('play_pattern').sort_values(ascending = True).unique()
+
+    # is this allowed like this?
+    @st.cache(suppress_st_warning=True)
+    def read_shot_data():
+        shot_df = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/shots_reduced.csv")
+        shot_df = shot_df.rename(columns = {'team_name': 'team', 'play_pattern_name': 'play_pattern'})
+        play_patterns_list = shot_df.get('play_pattern').sort_values(ascending = True).unique()
+        st.write("Running for 1st time only!")
+        return shot_df, play_patterns_list
+
+    shot_data, play_patterns = read_shot_data()
 
     team_shot_data = shot_data[shot_data["team"] == team_option]
 
@@ -195,7 +202,7 @@ def page():
     full_minutes = vc_df.merge(minute_df, how = 'outer').fillna(0)
 
     sns.set(rc = {'figure.figsize':(15,15)})
-    axs2 = sns.barplot(x = full_minutes['minute'], y = full_minutes['count']).set(title = 'Shot Distribution with 5 Minute Bins')
+    axs2 = sns.barplot(x = full_minutes['minute'], y = full_minutes['count']).set_title('Shot Distribution with 5 Minute Bins', fontsize = 20)
 
     shotcol1.pyplot(fig2, axs2)
 
@@ -203,12 +210,63 @@ def page():
 
     shot_reasons = team_shot_data.get('play_pattern')
     sns.set(rc = {'figure.figsize':(15,15)})
-    axs3 = sns.countplot(shot_reasons, order = play_patterns).set(title = 'Shots by Play Pattern')
+    axs3 = sns.countplot(shot_reasons, order = play_patterns).set_title('Shots by Play Pattern', fontsize = 20)
 
     shotcol2.pyplot(fig3, axs3)
 
     # RETURN TO TEAM SELECTION
     st.markdown(f"<a href='#{team_select}'>Try a different team?</a>", unsafe_allow_html=True)
+
+    st.markdown("### Exploring Passing Patterns")
+
+    @st.cache(suppress_st_warning=True)
+    def read_clean_pass_data():
+        passing_data = pd.read_csv('https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/withLastEvent.csv')
+
+        locs = passing_data.get("match_id") == 3749133
+        passing_data.loc[locs, :] = passing_data.loc[locs].replace({'Aston Villa': 'Aston Villa Men'})
+
+        locs = passing_data.get("match_id") == 3749552
+        passing_data.loc[locs, :] = passing_data.loc[locs].replace({'Manchester United': 'Manchester United Men'})
+
+        locs = passing_data.get("match_id") == 3749246
+        passing_data.loc[locs, :] = passing_data.loc[locs].replace({'Manchester United': 'Manchester United Men'})
+
+        locs = passing_data.get("match_id") == 18236
+        passing_data.loc[locs, :] = passing_data.loc[locs].replace({'Manchester United': 'Manchester United Men'})
+
+        locs = passing_data.get("match_id") == 3750201
+        passing_data.loc[locs, :] = passing_data.loc[locs].replace({'Manchester United': 'Manchester United Men'})
+
+        passing_data['possession_team_name'] = passing_data['possession_team_name'].replace({'Seattle Reign': 'OL Reign', 'Sky Blue FC':'NJ/NY Gotham FC'})
+        passing_data['team_name'] = passing_data['team_name'].replace({'Seattle Reign': 'OL Reign', 'Sky Blue FC':'NJ/NY Gotham FC'})
+
+        # DROP COLUMNS
+        reduced_pass = passing_data.get(['possession_team_name', 'idx', 'level_0', 'pass_recipient_name'])
+
+        st.write("Running for 1st time only!")
+        return reduced_pass
+
+    pass_data = read_clean_pass_data()
+
+    team_pass_data = pass_data[pass_data.get('possession_team_name') == team_option].reset_index(drop = True)
+
+    team_name_counts = team_pass_data.groupby('idx')['pass_recipient_name'].nunique()
+    team_pass_counts = team_pass_data.groupby('idx')['level_0'].count()
+
+    fig4 = plt.figure(3)
+
+    axs4 = sns.scatterplot(x = team_name_counts, y = team_pass_counts)
+    axs4.set_xlabel("# of Unique Players Involved in Passing Chain", fontsize = 20)
+    axs4.set_ylabel("# of Passes in Passing Chain", fontsize = 20)
+    axs4.set_title('# of Passes vs Unique Players in Passing Chain', fontsize = 40)
+
+    st.pyplot(fig4, axs4)
+
+
+
+    
+
 
 
 

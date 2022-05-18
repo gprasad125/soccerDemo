@@ -65,13 +65,18 @@ def page():
     
     st.info("If you're not sure where to start, we recommend choosing a 4-3-3 structure (4 defenders, 3 midfielders, and 3 attackers), as that was by far the most common lineup structure in our data.")
 
-    ppa_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_pos_averages.csv").set_index(['team_name','position_name','player_name'])
-    team_averages = ppa_data.loc[team_option]
+    @st.cache(suppress_st_warning=True)
+    def read_ppa_ppc_pploc():
+        ppa_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_pos_averages.csv").drop(['pass_length', 'pass_angle'], axis = 1).set_index(['team_name','position_name','player_name'])
+        ppc_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_pos_counts.csv").set_index(['team_name','position','player_name'])
+        pploc_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_positions_endlocs.csv")
+        st.write("Running for 1st time only!")
+        return ppa_data, ppc_data, pploc_data
 
-    ppc_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_pos_counts.csv").set_index(['team_name','position','player_name'])
-    team_counts = ppc_data.loc[team_option]
+    ppa, ppc, pploc = read_ppa_ppc_pploc()
 
-    pploc_data = pd.read_csv("https://media.githubusercontent.com/media/gprasad125/soccerDemo/main/Data/player_positions_endlocs.csv")
+    team_averages = ppa.loc[team_option]
+    team_counts = ppc.loc[team_option]
 
     attack = ['Striker', 'Center Forward', 'Left Wing', 'Right Center Forward', 'Right Wing', 'Striker', 'Left Center Forward', 'Secondary Striker']
     mid = ['Right Defensive Midfield', 'Center Defensive Midfield', 'Left Defensive Midfield', 'Right Midfield', 'Right Center Midfield', 'Center Midfield', 'Left Center Midfield', 'Left Midfield', 'Right Attacking Midfield', 'Center Attacking Midfield', 'Left Attacking Midfield']
