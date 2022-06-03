@@ -9,14 +9,16 @@ If you look in this repo's sub-folders, you will find all of the data files we u
 Please note that not all of our notebooks for exploratory data analysis are available in this repository - if you're interested in seeing these, let us know!
 
 ### Demo - Cloud Version
-The cloud version of the demo can be found here: [Click Here](https://share.streamlit.io/gprasad125/soccerdemo/main)
+The cloud version of the demo can be found [here](https://share.streamlit.io/gprasad125/soccerdemo/main).\
 This is currently not working, but we'll post an update here if we get it to work.
 
 ### Contact Information
-If you're interested in learning more about any of us, here's our information:
-Gokul Prasad - [GitHub](https://github.com/gprasad125)
-Esperanza Rozas - [GitHub](https://github.com/ESR76)
-Nikhil Hedge - [GitHub](https://github.com/nihegde18)
-Arnav Khanna - [GitHub](https://github.com/arnavkhanna)
+If you're interested in learning more about any of us, here's our information:\
+| Name | GitHub | LinkedIn |
+| ---- | ---- | ---- |
+| Gokul Prasad | [Link](https://github.com/gprasad125) | [Link](https://www.linkedin.com/in/gokul-prasad/) |
+| Esperanza Rozas | [Link](https://github.com/ESR76) | [Link](https://www.linkedin.com/in/esperanza-r/) |
+| Nikhil Hedge | [Link](https://github.com/nihegde18) | [Link]() |
+| Arnav Khanna | [Link](https://github.com/nihegde18) | [Link]() |
 
 Feel free to reach out to any of us to ask questions - we'd love to connect with you about this project!
