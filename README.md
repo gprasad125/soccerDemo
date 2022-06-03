@@ -15,6 +15,9 @@ Some of our earlier work with data cleaning can be found in a different reposito
 The cloud version of the demo can be found [here](https://share.streamlit.io/gprasad125/soccerdemo/main).\
 This is currently not working, but we'll post an update here if we get it to work.
 
+In the meantime, you can clone the repository and do the following to view the Streamlit demo. 
+1. CD into the repository, and run `streamlit run streamlit_app.py`
+
 ### Contact Information
 If you're interested in learning more about any of us, here's our information:
 | Name | GitHub | LinkedIn |
