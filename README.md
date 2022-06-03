@@ -13,7 +13,7 @@ The cloud version of the demo can be found [here](https://share.streamlit.io/gpr
 This is currently not working, but we'll post an update here if we get it to work.
 
 ### Contact Information
-If you're interested in learning more about any of us, here's our information:\
+If you're interested in learning more about any of us, here's our information:
 | Name | GitHub | LinkedIn |
 | ---- | ---- | ---- |
 | Gokul Prasad | [Link](https://github.com/gprasad125) | [Link](https://www.linkedin.com/in/gokul-prasad/) |
