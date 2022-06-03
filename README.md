@@ -1,5 +1,8 @@
-# soccerDemo
+# Passing and Team Success in Soccer - Completed May 31, 2022
 Welcome to the final repository for our project for UC San Diego's [Data Science Student Society's](https://ds3.ucsd.edu/) Winter 2022 Cohort.
+
+### Poster
+If you missed the showcase and would like to see our poster, feel free to view it [here](https://www.canva.com/design/DAE_GZZcC4s/534ixPVnTqEc9SkTeMDmJA/view?utm_content=DAE_GZZcC4s&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink).
 
 ### Repository Files
 In this repository, you can find the main demo file under "streamlit_app.py".
